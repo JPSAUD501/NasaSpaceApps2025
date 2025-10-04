@@ -14,7 +14,7 @@ export const EvaluateHabitatPlanRequestSchema = z.object({
 export const EvaluateHabitatPlanResponseSchema = z.object({
   score: z.number(),
   score_reason: z.string(),
-  improvements: z.array(z.string())
+  improvements_points: z.array(z.string())
 })
 
 export class EvaluateHabitatPlanRequestDto extends createZodDto(EvaluateHabitatPlanRequestSchema) {}

@@ -21,7 +21,7 @@ export class MissionService {
     return {
       score: 0,
       score_reason: 'TODO',
-      improvements: []
+      improvements_points: []
     }
   }
 }
