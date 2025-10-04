@@ -9,6 +9,6 @@ async function bootstrap (): Promise<void> {
     jsonDocumentUrl: '/openapi.json',
     yamlDocumentUrl: '/openapi.yaml'
   })
-  await app.listen(process.env.API_PORT ?? '')
+  await app.listen(process.env.PORT ?? '')
 }
 void bootstrap()
