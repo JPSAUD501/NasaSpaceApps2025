@@ -19,10 +19,6 @@ export class OpenRouterService {
     })
   }
 
-  getApiKey (): string {
-    return this.openrouterApiKey
-  }
-
   getClient (): OpenAI {
     return this.openaiClient
   }
