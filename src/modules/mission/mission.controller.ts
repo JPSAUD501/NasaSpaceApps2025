@@ -1,8 +1,8 @@
 import { Controller, Post, Body } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateMissionRequestDto, CreateMissionResponseDto } from './dto/create-mission'
+import { CreateMissionRequestDto, CreateMissionResponseDto } from './dto/create-mission.dto'
 import { MissionService } from './mission.service'
-import { EvaluateHabitatPlanRequestDto, EvaluateHabitatPlanResponseDto } from './dto/evaluate-habitat-plan'
+import { EvaluateHabitatPlanRequestDto, EvaluateHabitatPlanResponseDto } from './dto/evaluate-habitat-plan.dto'
 
 @ApiTags('Mission')
 @Controller('mission')

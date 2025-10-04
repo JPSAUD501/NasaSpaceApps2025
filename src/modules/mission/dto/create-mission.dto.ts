@@ -7,7 +7,7 @@ export const CreateMissionRequestSchema = z.object({
   description: z.string().min(1).max(500),
   crew_size: z.number().min(1).max(20),
   duration: z.number().min(1).max(1000),
-  destination: z.enum(['moon', 'mars', 'earth_orbit'])
+  destination: z.enum(['moon', 'mars'])
 })
 
 export const CreateMissionResponseSchema = z.object({
@@ -15,11 +15,10 @@ export const CreateMissionResponseSchema = z.object({
   description: z.string(),
   duration: z.number(),
   crew_size: z.number(),
-  habitat_floors: z.array(z.object({
-    level: z.number(),
-    x_length: z.number(),
-    y_length: z.number()
-  })),
+  habitat_dimensions: z.object({
+    x_width: z.number(),
+    z_height: z.number()
+  }),
   habitat_modules: z.array(z.object({
     uuid: z.string(),
     name: z.string(),
