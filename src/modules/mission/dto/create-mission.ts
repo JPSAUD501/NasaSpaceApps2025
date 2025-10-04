@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod'
 import { z } from 'zod'
+import { ModuleTypes } from './shared.dto'
 
 export const CreateMissionRequestSchema = z.object({
   player_name: z.string().min(1).max(100),
@@ -8,8 +9,6 @@ export const CreateMissionRequestSchema = z.object({
   duration: z.number().min(1).max(1000),
   destination: z.enum(['moon', 'mars', 'earth_orbit'])
 })
-
-export const ModuleTypes = z.enum(['private_crew_quarters', 'common_kitchen_and_mess', 'work_command_station', 'multipurpose_science_medical_area', 'dedicated_storage_logistics', 'radiation_shelter', 'dedicated_wcs', 'full_hygiene_station', 'permanent_exercise_area'])
 
 export const CreateMissionResponseSchema = z.object({
   name: z.string(),
