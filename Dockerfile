@@ -1,10 +1,12 @@
 FROM oven/bun:1 AS python-base
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends python3 python3-pip \
+	&& apt-get install -y --no-install-recommends \
+		python3 \
+		python3-pip \
+		python3-markdown \
+		python3-xhtml2pdf \
 	&& rm -rf /var/lib/apt/lists/*
-
-RUN python3 -m pip install --no-cache-dir markdown xhtml2pdf
 
 FROM python-base AS base
 WORKDIR /app
