@@ -17,6 +17,7 @@ ENV PORT=7071
 
 COPY --from=base /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/files ./dist/files
 COPY package.json bun.lock ./
 
 EXPOSE 3000

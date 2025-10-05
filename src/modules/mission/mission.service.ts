@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { Injectable } from '@nestjs/common'
 import { CreateMissionRequestDto, CreateMissionResponseDto } from './dto/create-mission.dto'
@@ -12,11 +12,19 @@ import nasaPapers from './prompts/nasa-papers'
 import createMission from './prompts/create-mission'
 
 const FLOOR_HEIGHT = 2
-const FILES_DIRECTORY = join(process.cwd(), 'src', 'files')
+const FILES_DIRECTORIES = [
+  join(process.cwd(), 'src', 'files'),
+  join(__dirname, '..', '..', 'files')
+]
 
 const loadFileAsBase64 = (filename: string): string => {
-  const filePath = join(FILES_DIRECTORY, filename)
-  return readFileSync(filePath).toString('base64')
+  for (const directory of FILES_DIRECTORIES) {
+    const filePath = join(directory, filename)
+    if (existsSync(filePath)) {
+      return readFileSync(filePath).toString('base64')
+    }
+  }
+  throw new Error(`Static asset not found: ${filename}`)
 }
 
 const MOCK_EVALUATION_IMAGES: EvaluateHabitatPlanResponseDto['images'] = [
