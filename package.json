@@ -8,9 +8,7 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
-    "start": "bun dist/main.js",
-    "postinstall": "playwright install | bun run playwright:install",
-    "playwright:install": "playwright install chromium"
+    "start": "bun dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "10.4.1",
@@ -30,7 +28,6 @@
     "natural": "^8.1.0",
     "nestjs-zod": "4.3.1",
     "openai": "^6.1.0",
-    "playwright": "^1.55.1",
     "yaml": "2.5.1",
     "zod": "3.25.67"
   },
