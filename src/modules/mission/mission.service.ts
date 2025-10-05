@@ -4,11 +4,67 @@ import { EvaluateHabitatPlanRequestDto, EvaluateHabitatPlanResponseDto } from '.
 import { z } from 'zod'
 import { EvaluatorFactorSchema, ModuleRelationSchema, ModuleRelationships, ModuleTypes } from './dto/shared.dto'
 import { CalculateModuleDistanceDto } from './dto/calculate-module-distance.dto'
+import { OpenRouterService } from '../../providers/openrouter/openrouter.service'
+import { zodResponseFormat } from 'openai/helpers/zod'
 
 const FLOOR_HEIGHT = 2
 
 @Injectable()
 export class MissionService {
+  constructor (
+    private readonly openrouterService: OpenRouterService
+  ) {}
+
+  async create (dto: CreateMissionRequestDto): Promise<CreateMissionResponseDto> {
+    const nasaPapersMd = await Bun.file('./prompts/nasa-papers.md').text()
+    const promptMd = await Bun.file('./prompts/create-mission.md').text()
+    const responseSchema = z.object({
+      formal_description: z.string().describe('Descrição formal e detalhada da missão como um todo, incluindo objetivos científicos, metas de exploração e qualquer outro detalhe relevante como contexto histórico ou importância da missão. Deve ter entre 100 e 300 palavras e ser escrito de forma clara e envolvente.'),
+      habitat_dimensions: z.object({
+        x_width: z.number().describe('Tamanho no eixo X em metros (mínimo de 5 metros e máximo de 15 metros)'),
+        y_width: z.number().describe('Tamanho no eixo Y em metros (mínimo de 5 metros e máximo de 15 metros)')
+      }),
+      habitat: z.array(z.object({
+        name: z.string().describe('Nome do ambiente dentro do habitat (ex: "Quarto 1", "Quarto 2", "Laboratório de Ciências", "Estufa de Plantas", etc)'),
+        reason: z.string().describe('Justificativa para a existência do ambiente no habitat'),
+        type: z.enum(ModuleTypes.options).describe(`Tipo do ambiente, deve ser exclusivamente um dos seguintes: ${ModuleTypes.options.map(o => `"${o}"`).join(', ')}`),
+        square_meters: z.number().describe('Tamanho do ambiente em metros quadrados mínimo de 1 metros quadrados e máximo de 10 metros quadrados')
+      }).describe('Lista de ambientes do habitat espacial'))
+    })
+    const parsedPrompt = promptMd
+      .replace('{{NASA-PAPERS}}', nasaPapersMd)
+      .replace('{{MISSION_NAME}}', dto.name)
+      .replace('{{MISSION_OBJECTIVE}}', dto.description)
+      .replace('{{DESTINATION}}', dto.destination)
+      .replace('{{DURATION}}', dto.duration.toString())
+      .replace('{{CREW_SIZE}}', dto.crew_size.toString())
+      .replace('{{MODULE_TYPES}}', ModuleTypes.options.map(o => o).join(', '))
+    const response = await this.openrouterService.getClient().chat.completions.create({
+      model: 'x-ai/grok-4-fast',
+      messages: [
+        { role: 'user', content: parsedPrompt }
+      ],
+      response_format: zodResponseFormat(responseSchema, 'mission-schema')
+    })
+    const parsedResponse = responseSchema.parse(response.choices[0].message?.content ?? {})
+    return {
+      name: dto.name,
+      formal_description: parsedResponse.formal_description,
+      duration: dto.duration,
+      crew_size: dto.crew_size,
+      habitat_dimensions: { x_width: parsedResponse.habitat_dimensions.x_width, y_width: parsedResponse.habitat_dimensions.y_width },
+      habitat_modules: parsedResponse.habitat.map(module => {
+        const uuid = crypto.randomUUID()
+        return {
+          uuid,
+          name: module.name,
+          reason: module.reason,
+          type: module.type
+        }
+      })
+    }
+  }
+
   async calculateMaxDistance (floors: number, xWidth: number, yWidth: number): Promise<number> {
     return await this.calculateModuleDistance([
       { floor: 1, x: 1, y: 1 },
@@ -25,18 +81,6 @@ export class MissionService {
     const floorDistance = Math.abs(moduleA.floor - moduleB.floor) * FLOOR_HEIGHT
     const totalDistance = Math.sqrt(Math.pow(horizontalDistance, 2) + Math.pow(floorDistance, 2))
     return totalDistance
-  }
-
-  async create (dto: CreateMissionRequestDto): Promise<CreateMissionResponseDto> {
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    return {
-      name: 'TODO',
-      description: 'TODO',
-      duration: 0,
-      crew_size: 0,
-      habitat_dimensions: { x_width: 0, z_height: 0 },
-      habitat_modules: []
-    }
   }
 
   async evaluateHabitatPlan (dto: EvaluateHabitatPlanRequestDto): Promise<EvaluateHabitatPlanResponseDto> {

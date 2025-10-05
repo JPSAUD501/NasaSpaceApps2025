@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { ModuleTypes } from './shared.dto'
 
 export const CreateMissionRequestSchema = z.object({
+  name: z.string().min(1).max(100),
   player_name: z.string().min(1).max(100),
   description: z.string().min(1).max(500),
   crew_size: z.number().min(1).max(20),
@@ -12,23 +13,18 @@ export const CreateMissionRequestSchema = z.object({
 
 export const CreateMissionResponseSchema = z.object({
   name: z.string(),
-  description: z.string(),
+  formal_description: z.string(),
   duration: z.number(),
   crew_size: z.number(),
   habitat_dimensions: z.object({
     x_width: z.number(),
-    z_height: z.number()
+    y_width: z.number()
   }),
   habitat_modules: z.array(z.object({
     uuid: z.string(),
     name: z.string(),
     reason: z.string(),
-    type: ModuleTypes,
-    relationship_with: z.object({
-      type: ModuleTypes,
-      points: z.number().min(-100).max(100),
-      reason: z.string().min(1).max(300)
-    })
+    type: ModuleTypes
   }))
 })
 
