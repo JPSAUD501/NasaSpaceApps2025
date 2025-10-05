@@ -3,6 +3,8 @@ WORKDIR /app
 
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
+RUN bunx playwright install-deps chromium
+RUN bun run playwright:install
 
 FROM base AS builder
 COPY nest-cli.json tsconfig.json tsconfig.build.json ./
