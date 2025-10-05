@@ -2,9 +2,7 @@ FROM oven/bun:1 AS base
 WORKDIR /app
 
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
-RUN bunx playwright install-deps chromium
-RUN bun run playwright:install
+RUN bun ci
 
 FROM base AS builder
 COPY nest-cli.json tsconfig.json tsconfig.build.json ./

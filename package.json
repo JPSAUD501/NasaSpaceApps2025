@@ -9,7 +9,7 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "bun dist/main.js",
-    "postinstall": "playwright install",
+    "postinstall": "playwright install | bun run playwright:install",
     "playwright:install": "playwright install chromium"
   },
   "dependencies": {
