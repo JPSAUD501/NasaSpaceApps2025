@@ -9,7 +9,7 @@ Toda sua resposta deve estar em pt-BR e no seguinte formato JSON estrito, sem qu
   "formal_description": string, // Descrição formal da missão como um todo, incluindo objetivos científicos, metas de exploração e qualquer outro detalhe relevante como contexto histórico ou importância da missão. Deve ter até 100 palavras e ser escrito de forma clara e envolvente.
   "habitat": [ // Lista de ambientes do habitat espacial
     {
-      "name": string, // Nome do ambiente dentro do habitat (ex: "Quarto 1', Quarto 2, "Laboratório de Ciências", "Estufa de Plantas", etc)
+      "name": string, // Nome do ambiente dentro do habitat contextualizado com o objetivo da missão (ex: "Quarto 1', Quarto 2, "Laboratório de Amostra Subterrânea", "Estufa de Novas Espécies", etc)
       "brief_reason": string, // Breve justificativa para a existência do ambiente no habitat com foco no contexto do objetivo da missão
       "type": string, // Tipo do ambiente, deve ser exclusivamente um dos seguintes: {{MODULE_TYPES}}
       "square_meters": number // Tamanho do ambiente em metros quadrados mínimo de 1 metros quadrados e máximo de 10 metros quadrados
