@@ -66,7 +66,7 @@ export class MissionService {
       .replace('{{CREW_SIZE}}', dto.crew_size.toString())
       .replace('{{MODULE_TYPES}}', ModuleTypes.options.map(o => o).join(', '))
     const response = await this.openrouterService.getClient().chat.completions.create({
-      model: 'x-ai/grok-4-fast',
+      model: 'openai/gpt-oss-120b',
       messages: [
         { role: 'user', content: parsedPrompt }
       ],
@@ -186,7 +186,7 @@ export class MissionService {
       .replace('{{DOCS}}', projectDocs)
       .replace('{{MISSION_PLAN}}', JSON.stringify(dto.mission, null, 2))
     const response = await this.openrouterService.getClient().chat.completions.create({
-      model: 'x-ai/grok-4-fast',
+      model: 'openai/gpt-oss-120b',
       messages: [
         { role: 'user', content: prompt }
       ]
