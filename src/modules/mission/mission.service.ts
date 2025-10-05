@@ -32,12 +32,12 @@ const loadFileAsBase64 = (filename: string): string => {
 
 const MOCK_EVALUATION_IMAGES: EvaluateHabitatPlanResponseDto['images'] = [
   {
-    name: 'alert-nebula-logo.png',
-    base64: loadFileAsBase64('Logo _OutOfSpace_ com Nebulosa Astral.png')
+    name: '1.png',
+    base64: loadFileAsBase64('img1.png')
   },
   {
-    name: 'braces-pixel-logo.png',
-    base64: loadFileAsBase64('Logo do OutOfSpace no Space Apps.png')
+    name: '2.png',
+    base64: loadFileAsBase64('img2.png')
   }
 ]
 
