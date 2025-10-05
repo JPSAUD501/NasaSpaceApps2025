@@ -4,7 +4,7 @@ import { ModuleTypes } from './shared.dto'
 
 export const CreateMissionRequestSchema = z.object({
   name: z.string().min(1).max(100),
-  player_name: z.string().min(1).max(100),
+  architect_name: z.string().min(1).max(100),
   description: z.string().min(1).max(500),
   crew_size: z.number().min(1).max(20),
   duration: z.number().min(1).max(1000),

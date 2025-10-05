@@ -192,7 +192,12 @@ export class MissionService {
         { role: 'user', content: prompt }
       ]
     })
-    console.log('PDF Generation Response:', response)
+    const pdfContent = response.choices[0].message?.content ?? ''
+    if (pdfContent.length <= 0) {
+      throw new Error('Failed to generate PDF content for the habitat plan evaluation.')
+    }
+    console.debug(pdfContent)
+    // Convert pdfContent from md to PDF and then to base64
     return {
       score: finalScore,
       worse_points: orderedEvaluatorFactors.slice(0, 3),
