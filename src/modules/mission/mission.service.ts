@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve as resolvePath } from 'node:path'
 import { Injectable } from '@nestjs/common'
 import { CreateMissionRequestDto, CreateMissionResponseDto } from './dto/create-mission.dto'
 import { EvaluateHabitatPlanRequestDto, EvaluateHabitatPlanResponseDto } from './dto/evaluate-habitat-plan.dto'
@@ -12,6 +12,7 @@ import nasaPapers from './prompts/nasa-papers'
 import createMission from './prompts/create-mission'
 import createMissionPdf from './prompts/create-mission-pdf'
 import projectDocs from './prompts/project-docs'
+import { spawn } from 'node:child_process'
 
 const FLOOR_HEIGHT = 2
 const FILES_DIRECTORIES = [
@@ -205,6 +206,37 @@ export class MissionService {
   }
 
   async mdToPdfBase64 (md: string): Promise<string> {
-    return ''
+    return await new Promise((resolve, reject) => {
+      // Ajuste o caminho do script conforme sua estrutura:
+      const scriptPath = resolvePath(process.cwd(), 'src', 'modules', 'mission', 'script.py')
+      // Permite override via env (PYTHON=python, py, etc.)
+      const pythonExe = 'python3'
+
+      const proc = spawn(pythonExe, [scriptPath], {
+        stdio: ['pipe', 'pipe', 'pipe']
+      })
+
+      let out = ''
+      let err = ''
+
+      proc.stdout.setEncoding('utf8')
+      proc.stderr.setEncoding('utf8')
+
+      proc.stdout.on('data', (chunk) => { out += chunk })
+      proc.stderr.on('data', (chunk) => { err += chunk })
+
+      proc.on('close', (code) => {
+        const trimmed = out.trim()
+        if (code === 0 && trimmed.length > 0) {
+          resolve(trimmed) // base64 do PDF
+        } else {
+          reject(new Error(`md2pdf_base64.py falhou (code=${code}): ${(err.length > 0) || 'sem detalhes'}`))
+        }
+      })
+
+      // Envia o Markdown para o stdin do script
+      proc.stdin.write(md, 'utf8')
+      proc.stdin.end()
+    })
   }
 }
