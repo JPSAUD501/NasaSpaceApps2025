@@ -12,7 +12,7 @@ FROM python-base AS base
 WORKDIR /app
 
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile=false
+RUN bun install
 
 FROM base AS builder
 COPY nest-cli.json tsconfig.json tsconfig.build.json ./
