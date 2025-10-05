@@ -18,6 +18,7 @@
     "@nestjs/swagger": "7.4.0",
     "@scalar/nestjs-api-reference": "0.3.149",
     "@supercharge/promise-pool": "3.2.0",
+    "@types/bun": "^1.2.23",
     "@types/multer": "^2.0.0",
     "@types/natural": "^6.0.1",
     "class-transformer": "0.5.1",
