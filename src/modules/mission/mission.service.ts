@@ -6,6 +6,7 @@ import { EvaluatorFactorSchema, ModuleRelationSchema, ModuleRelationships, Modul
 import { CalculateModuleDistanceDto } from './dto/calculate-module-distance.dto'
 import { OpenRouterService } from '../../providers/openrouter/openrouter.service'
 import { zodResponseFormat } from 'openai/helpers/zod'
+import path from 'node:path'
 
 const FLOOR_HEIGHT = 2
 
@@ -16,17 +17,16 @@ export class MissionService {
   ) {}
 
   async create (dto: CreateMissionRequestDto): Promise<CreateMissionResponseDto> {
-    const nasaPapersMd = await Bun.file('./prompts/nasa-papers.md').text()
-    const promptMd = await Bun.file('./prompts/create-mission.md').text()
+    // Preciso do full path pq o Bun roda o processo em outro diretório
+    // const dir = path.resolve()
+    const cwd = process.cwd()
+    const nasaPapersMd = await Bun.file(path.join(cwd, './src/modules/mission/prompts/nasa-papers.md')).text()
+    const promptMd = await Bun.file(path.join(cwd, './src/modules/mission/prompts/create-mission.md')).text()
     const responseSchema = z.object({
-      formal_description: z.string().describe('Descrição formal e detalhada da missão como um todo, incluindo objetivos científicos, metas de exploração e qualquer outro detalhe relevante como contexto histórico ou importância da missão. Deve ter entre 100 e 300 palavras e ser escrito de forma clara e envolvente.'),
-      habitat_dimensions: z.object({
-        x_width: z.number().describe('Tamanho no eixo X em metros (mínimo de 5 metros e máximo de 15 metros)'),
-        y_width: z.number().describe('Tamanho no eixo Y em metros (mínimo de 5 metros e máximo de 15 metros)')
-      }),
+      formal_description: z.string().describe('Descrição formal da missão como um todo, incluindo objetivos científicos, metas de exploração e qualquer outro detalhe relevante como contexto histórico ou importância da missão. Deve ter até 100 palavras e ser escrito de forma clara e envolvente.'),
       habitat: z.array(z.object({
         name: z.string().describe('Nome do ambiente dentro do habitat (ex: "Quarto 1", "Quarto 2", "Laboratório de Ciências", "Estufa de Plantas", etc)'),
-        reason: z.string().describe('Justificativa para a existência do ambiente no habitat'),
+        brief_reason: z.string().describe('Breve justificativa para a existência do ambiente no habitat com foco no contexto do objetivo da missão'),
         type: z.enum(ModuleTypes.options).describe(`Tipo do ambiente, deve ser exclusivamente um dos seguintes: ${ModuleTypes.options.map(o => `"${o}"`).join(', ')}`),
         square_meters: z.number().describe('Tamanho do ambiente em metros quadrados mínimo de 1 metros quadrados e máximo de 10 metros quadrados')
       }).describe('Lista de ambientes do habitat espacial'))
@@ -46,19 +46,29 @@ export class MissionService {
       ],
       response_format: zodResponseFormat(responseSchema, 'mission-schema')
     })
-    const parsedResponse = responseSchema.parse(response.choices[0].message?.content ?? {})
+    const rawContent = response.choices[0].message?.content
+    const parsedResponse = responseSchema.parse(JSON.parse(rawContent ?? '{}'))
+    let totalSpace = 0
+    for (const module of parsedResponse.habitat) {
+      totalSpace += module.square_meters
+    }
+    const habitatArea = Math.sqrt(totalSpace) * 1
+    const parsedHabitatArea = Math.floor(habitatArea)
     return {
       name: dto.name,
       formal_description: parsedResponse.formal_description,
       duration: dto.duration,
       crew_size: dto.crew_size,
-      habitat_dimensions: { x_width: parsedResponse.habitat_dimensions.x_width, y_width: parsedResponse.habitat_dimensions.y_width },
+      habitat_dimensions: {
+        x_width: parsedHabitatArea,
+        y_width: parsedHabitatArea
+      },
       habitat_modules: parsedResponse.habitat.map(module => {
         const uuid = crypto.randomUUID()
         return {
           uuid,
           name: module.name,
-          reason: module.reason,
+          brief_reason: module.brief_reason,
           type: module.type
         }
       })

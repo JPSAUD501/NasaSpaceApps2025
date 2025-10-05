@@ -23,7 +23,7 @@ export const CreateMissionResponseSchema = z.object({
   habitat_modules: z.array(z.object({
     uuid: z.string(),
     name: z.string(),
-    reason: z.string(),
+    brief_reason: z.string(),
     type: ModuleTypes
   }))
 })
