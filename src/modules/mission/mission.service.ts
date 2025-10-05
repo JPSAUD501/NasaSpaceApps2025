@@ -6,7 +6,8 @@ import { EvaluatorFactorSchema, ModuleRelationSchema, ModuleRelationships, Modul
 import { CalculateModuleDistanceDto } from './dto/calculate-module-distance.dto'
 import { OpenRouterService } from '../../providers/openrouter/openrouter.service'
 import { zodResponseFormat } from 'openai/helpers/zod'
-import path from 'node:path'
+import nasaPapers from './prompts/nasa-papers'
+import createMission from './prompts/create-mission'
 
 const FLOOR_HEIGHT = 2
 
@@ -17,11 +18,6 @@ export class MissionService {
   ) {}
 
   async create (dto: CreateMissionRequestDto): Promise<CreateMissionResponseDto> {
-    // Preciso do full path pq o Bun roda o processo em outro diretório
-    // const dir = path.resolve()
-    const cwd = process.cwd()
-    const nasaPapersMd = await Bun.file(path.join(cwd, './src/modules/mission/prompts/nasa-papers.md')).text()
-    const promptMd = await Bun.file(path.join(cwd, './src/modules/mission/prompts/create-mission.md')).text()
     const responseSchema = z.object({
       formal_description: z.string(),
       habitat: z.array(z.object({
@@ -31,8 +27,8 @@ export class MissionService {
         square_meters: z.number()
       }))
     })
-    const parsedPrompt = promptMd
-      .replace('{{NASA-PAPERS}}', nasaPapersMd)
+    const parsedPrompt = createMission
+      .replace('{{NASA-PAPERS}}', nasaPapers)
       .replace('{{MISSION_NAME}}', dto.name)
       .replace('{{MISSION_OBJECTIVE}}', dto.description)
       .replace('{{DESTINATION}}', dto.destination)

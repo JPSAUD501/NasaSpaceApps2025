@@ -1,3 +1,4 @@
+export default `
 U.S. Government work not protected by U.S. copyright
 Defining the Required Net Habitable Volume for LongDuration Exploration Missions
 Chel Stromgren, Callie Burke, Jason Cho, and Robert
@@ -5344,3 +5345,4 @@ preference items, tools, etc., during EVA prep and post operations.
 • Multipurpose Airlock Acceptability → C
 170 Crew lock umbilical interfaces and restraint designs currently in use on ISS should
 be provided. • Multipurpose Airlock Acceptability → C
+`.trim()

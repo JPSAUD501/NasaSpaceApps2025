@@ -1,3 +1,4 @@
+export default `
 {{NASA-PAPERS}}
 
 Com base nos documentos acima da NASA, precisamos planejar uma missão espacial nomeada "{{MISSION_NAME}}". O objetivo da  missão é: "{{MISSION_OBJECTIVE}}". O destino da missão é "{{DESTINATION}}". A missão terá uma duração de {{DURATION}} dias e contará com uma tripulação de {{CREW_SIZE}} astronautas.
@@ -15,3 +16,4 @@ Toda sua resposta deve estar em pt-BR e no seguinte formato JSON estrito, sem qu
     }
   ]
 }
+`.trim()
