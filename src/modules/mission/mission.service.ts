@@ -155,7 +155,9 @@ export class MissionService {
     return {
       score: finalScore,
       worse_points: orderedEvaluatorFactors.slice(0, 3),
-      improvements_points: orderedEvaluatorFactors.slice(-3).reverse()
+      improvements_points: orderedEvaluatorFactors.slice(-3).reverse(),
+      images: [],
+      pdf_base64: ''
     }
   }
 }
