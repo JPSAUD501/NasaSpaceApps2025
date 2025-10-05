@@ -10,6 +10,8 @@ import { OpenRouterService } from '../../providers/openrouter/openrouter.service
 import { zodResponseFormat } from 'openai/helpers/zod'
 import nasaPapers from './prompts/nasa-papers'
 import createMission from './prompts/create-mission'
+import createMissionPdf from './prompts/create-mission-pdf'
+import projectDocs from './prompts/project-docs'
 
 const FLOOR_HEIGHT = 2
 const FILES_DIRECTORIES = [
@@ -181,6 +183,16 @@ export class MissionService {
     const orderedEvaluatorFactors = evaluatorFactors.sort((a, b) => a.points - b.points)
     const totalPoints = relations.reduce((acc, curr) => acc + curr.points, 0)
     const finalScore = Math.round(totalPoints / relations.length)
+    const prompt = createMissionPdf
+      .replace('{{DOCS}}', projectDocs)
+      .replace('{{MISSION_PLAN}}', JSON.stringify(dto.mission, null, 2))
+    const response = await this.openrouterService.getClient().chat.completions.create({
+      model: 'x-ai/grok-4-fast',
+      messages: [
+        { role: 'user', content: prompt }
+      ]
+    })
+    console.log('PDF Generation Response:', response)
     return {
       score: finalScore,
       worse_points: orderedEvaluatorFactors.slice(0, 3),
