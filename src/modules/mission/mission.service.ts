@@ -230,7 +230,7 @@ export class MissionService {
         if (code === 0 && trimmed.length > 0) {
           resolve(trimmed) // base64 do PDF
         } else {
-          reject(new Error(`md2pdf_base64.py falhou (code=${code}): ${(err.length > 0) || 'sem detalhes'}`))
+          reject(new Error(`md2pdf_base64.py falhou (code=${code}): ${err.trim().length > 0 ? err.trim() : 'sem detalhes'}`))
         }
       })
 

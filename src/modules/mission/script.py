@@ -5,6 +5,7 @@ import sys
 import base64
 from io import BytesIO
 from datetime import datetime, timezone
+from typing import Iterable
 
 # --- Markdown -> HTML ---
 try:
@@ -35,6 +36,24 @@ if html_to_pdf_bytes is None:
         file=sys.stderr
     )
     sys.exit(3)
+
+
+def _first_successful_decode(data: bytes, encodings: Iterable[str]) -> str:
+    for encoding in encodings:
+        try:
+            return data.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+        # Último recurso: substitui bytes inválidos pelo caractere U+FFFD
+    return data.decode("utf-8", errors="replace")
+
+
+def _sanitize_utf8(text: str) -> str:
+    try:
+        text.encode("utf-8")
+        return text
+    except UnicodeEncodeError:
+        return text.encode("utf-8", errors="replace").decode("utf-8")
 
 def md_to_html(md_text: str) -> str:
     # Extensões úteis: tabelas, blocos de código, etc.
@@ -69,17 +88,27 @@ def md_to_html(md_text: str) -> str:
     return html
 
 def main():
-    md = sys.stdin.read()
-    if not md.strip():
+    raw = sys.stdin.buffer.read()
+    if not raw.strip():
         print("Erro: entrada vazia. Envie o Markdown via stdin.", file=sys.stderr)
         sys.exit(1)
+
+    preferred_encodings = (
+        "utf-8-sig",  # BOM-friendly
+        "utf-8",
+        "utf-16",
+        "utf-16-le",
+        "utf-16-be",
+    )
+
+    md = _sanitize_utf8(_first_successful_decode(raw, preferred_encodings))
 
     try:
         html = md_to_html(md)
         if html_to_pdf_bytes is None:
             print("Erro: nenhuma engine de PDF disponível.", file=sys.stderr)
             sys.exit(3)
-        pdf_bytes = html_to_pdf_bytes(html)
+        pdf_bytes = html_to_pdf_bytes(_sanitize_utf8(html))
         b64 = base64.b64encode(pdf_bytes).decode("ascii")
         # Apenas a string base64 no stdout
         sys.stdout.write(b64)

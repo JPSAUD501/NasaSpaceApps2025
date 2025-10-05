@@ -64,7 +64,7 @@ describe('MissionService', () => {
   it('evaluates a habitat plan using the generated mission plan', async () => {
     const createMissionRequest = {
       name: 'SofaPraDormir',
-      architect_name: 'Anonimo',
+      architect_name: 'João Pedro',
       description: 'Explorar o planeta marte para encontrar sofas naturais e estudar sua viabilidade para o descanso da tripulação e exportação marciana.',
       crew_size: 5,
       destination: 'mars'
