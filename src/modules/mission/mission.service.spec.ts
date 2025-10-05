@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config'
 import { MissionService } from './mission.service'
 import { OpenRouterModule } from '../../providers/openrouter/openrouter.module'
 import { EvaluateHabitatPlanRequestSchema } from './dto/evaluate-habitat-plan.dto'
-import { CreateMissionRequestSchema } from './dto/create-mission.dto'
+import { CreateMissionRequestSchema, CreateMissionResponseSchema } from './dto/create-mission.dto'
 import { ModuleTypes } from './dto/shared.dto'
 
 describe('MissionService', () => {
@@ -57,7 +57,28 @@ describe('MissionService', () => {
   })
 
   it('evaluates a simple habitat plan and returns a perfect score when positive relationships dominate', async () => {
+    const mission = CreateMissionResponseSchema.parse({
+      name: 'Mock Mission',
+      formal_description: 'Missão fictícia para validar avaliação de habitat.',
+      duration: 180,
+      crew_size: 4,
+      habitat_dimensions: {
+        x_width: 10,
+        y_width: 10
+      },
+      habitat_modules: [
+        {
+          uuid: 'mock-uuid-1',
+          name: 'Abrigo contra Radiação',
+          brief_reason: 'Protege a tripulação contra tempestades solares.',
+          type: 'radiation_shelter',
+          quantity: 12
+        }
+      ]
+    })
+
     const dto = EvaluateHabitatPlanRequestSchema.parse({
+      mission,
       floors: [
         {
           matrix: [
@@ -97,6 +118,15 @@ describe('MissionService', () => {
       with: 'private_crew_quarters',
       points: 100
     })
+
+    expect(evaluation.images).toHaveLength(2)
+    evaluation.images.forEach(image => {
+      expect(image.name.length).toBeGreaterThan(0)
+      expect(image.base64.length).toBeGreaterThan(0)
+    })
+
+    expect(evaluation.pdf_base64).toBeDefined()
+    expect((evaluation.pdf_base64 ?? '').length).toBeGreaterThan(0)
   })
 
   it('creates a mission plan using the OpenRouter API', async () => {
