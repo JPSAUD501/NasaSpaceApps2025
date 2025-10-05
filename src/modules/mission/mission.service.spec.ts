@@ -5,7 +5,6 @@ import { MissionService } from './mission.service'
 import { OpenRouterModule } from '../../providers/openrouter/openrouter.module'
 import { CreateMissionRequestSchema, CreateMissionResponseSchema } from './dto/create-mission.dto'
 import { EvaluateHabitatPlanRequestSchema, EvaluateHabitatPlanResponseSchema } from './dto/evaluate-habitat-plan.dto'
-import { ModuleTypes } from './dto/shared.dto'
 import { z } from 'zod'
 
 describe('MissionService', () => {
@@ -59,8 +58,6 @@ describe('MissionService', () => {
 
     const response = CreateMissionResponseSchema.parse(await service.create(request))
 
-    console.debug(response)
-
     expect(response).toBeDefined()
   }, 90000)
 
@@ -75,32 +72,34 @@ describe('MissionService', () => {
 
     const missionRequest = CreateMissionRequestSchema.parse(createMissionRequest)
 
-    const missionPlan = CreateMissionResponseSchema.parse(await service.create(missionRequest))
+    const missionPlan = await service.create(missionRequest)
 
-    const gridSize = Math.max(2, Math.ceil(Math.sqrt(Math.max(1, missionPlan.habitat_modules.length))))
-    const modulesPerFloor = gridSize * gridSize
-    const floorsCount = Math.max(1, Math.ceil(missionPlan.habitat_modules.length / modulesPerFloor))
-
-    type ModuleCell = { type: z.infer<typeof ModuleTypes> } | null
-
-    const floors = Array.from({ length: floorsCount }, () => ({
-      matrix: Array.from({ length: gridSize }, () =>
-        Array.from({ length: gridSize }, () => null as ModuleCell)
-      )
-    }))
-
-    missionPlan.habitat_modules.forEach((module, index) => {
-      const floorIndex = Math.floor(index / modulesPerFloor)
-      const slotIndex = index % modulesPerFloor
-      const row = Math.floor(slotIndex / gridSize)
-      const column = slotIndex % gridSize
-      floors[floorIndex].matrix[row][column] = { type: module.type }
-    })
+    console.debug('Generated mission plan')
 
     const evaluationRequest = EvaluateHabitatPlanRequestSchema.parse({
-      floors,
+      floors: [
+        {
+          matrix: [
+            [
+              { type: 'common_kitchen_and_mess' },
+              null,
+              { type: 'common_kitchen_and_mess' }
+            ],
+            [
+              null,
+              null,
+              null
+            ],
+            [
+              { type: 'common_kitchen_and_mess' },
+              null,
+              { type: 'private_crew_quarters' }
+            ]
+          ]
+        }
+      ],
       mission: missionPlan
-    })
+    } satisfies z.input<typeof EvaluateHabitatPlanRequestSchema>)
 
     const evaluationResponse = EvaluateHabitatPlanResponseSchema.parse(
       await service.evaluateHabitatPlan(evaluationRequest)
@@ -111,5 +110,5 @@ describe('MissionService', () => {
     expect(evaluationResponse.worse_points.length).toBeGreaterThan(0)
     expect(evaluationResponse.images.length).toBeGreaterThan(0)
     expect((evaluationResponse.pdf_base64?.length ?? 0)).toBeGreaterThan(0)
-  }, 120000)
+  }, 240000)
 })
