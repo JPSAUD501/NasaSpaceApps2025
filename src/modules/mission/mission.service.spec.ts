@@ -101,12 +101,12 @@ describe('MissionService', () => {
 
   it('creates a mission plan using the OpenRouter API', async () => {
     const request = CreateMissionRequestSchema.parse({
-      name: 'Integration Mission',
-      player_name: 'Test Player',
-      description: 'Integration test mission to validate OpenRouter response.',
-      crew_size: 4,
-      duration: 180,
-      destination: 'moon'
+      name: 'OutOfSpace Odyssey',
+      player_name: 'João Pedro Saud Cardoso',
+      description: 'Explorar marte e tentar encontrar vida marciana dentro do planeta',
+      crew_size: 5,
+      duration: 365,
+      destination: 'mars'
     })
 
     const response = await service.create(request)

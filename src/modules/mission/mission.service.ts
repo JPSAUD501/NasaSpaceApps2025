@@ -69,7 +69,8 @@ export class MissionService {
           uuid,
           name: module.name,
           brief_reason: module.brief_reason,
-          type: module.type
+          type: module.type,
+          quantity: module.square_meters
         }
       })
     }

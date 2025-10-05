@@ -24,7 +24,8 @@ export const CreateMissionResponseSchema = z.object({
     uuid: z.string(),
     name: z.string(),
     brief_reason: z.string(),
-    type: ModuleTypes
+    type: ModuleTypes,
+    quantity: z.number()
   }))
 })
 
