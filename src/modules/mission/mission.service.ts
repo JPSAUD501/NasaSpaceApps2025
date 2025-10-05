@@ -23,13 +23,13 @@ export class MissionService {
     const nasaPapersMd = await Bun.file(path.join(cwd, './src/modules/mission/prompts/nasa-papers.md')).text()
     const promptMd = await Bun.file(path.join(cwd, './src/modules/mission/prompts/create-mission.md')).text()
     const responseSchema = z.object({
-      formal_description: z.string().describe('Descrição formal da missão como um todo, incluindo objetivos científicos, metas de exploração e qualquer outro detalhe relevante como contexto histórico ou importância da missão. Deve ter até 100 palavras e ser escrito de forma clara e envolvente.'),
+      formal_description: z.string(),
       habitat: z.array(z.object({
-        name: z.string().describe('Nome do ambiente dentro do habitat (ex: "Quarto 1", "Quarto 2", "Laboratório de Ciências", "Estufa de Plantas", etc)'),
-        brief_reason: z.string().describe('Breve justificativa para a existência do ambiente no habitat com foco no contexto do objetivo da missão'),
-        type: z.enum(ModuleTypes.options).describe(`Tipo do ambiente, deve ser exclusivamente um dos seguintes: ${ModuleTypes.options.map(o => `"${o}"`).join(', ')}`),
-        square_meters: z.number().describe('Tamanho do ambiente em metros quadrados mínimo de 1 metros quadrados e máximo de 10 metros quadrados')
-      }).describe('Lista de ambientes do habitat espacial'))
+        name: z.string(),
+        brief_reason: z.string(),
+        type: z.enum(ModuleTypes.options),
+        square_meters: z.number()
+      }))
     })
     const parsedPrompt = promptMd
       .replace('{{NASA-PAPERS}}', nasaPapersMd)
