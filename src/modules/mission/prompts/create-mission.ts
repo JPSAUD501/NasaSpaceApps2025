@@ -1,13 +1,14 @@
 export default `
 {{NASA-PAPERS}}
 
-Com base nos documentos acima da NASA, precisamos planejar uma missão espacial nomeada "{{MISSION_NAME}}". O objetivo da  missão é: "{{MISSION_OBJECTIVE}}". O destino da missão é "{{DESTINATION}}". A missão terá uma duração de {{DURATION}} dias e contará com uma tripulação de {{CREW_SIZE}} astronautas.
-Você devera planejar quais ambientes o habitat espacial da missão deve ter para garantir o sucesso da missão e o bem-estar da tripulação. No seu planejamento inclua o nome de cada ambiente como por exemplo "Quarto 1', "Laboratório de Ciências", "Estufa de Plantas", etc. Inclua para cada um desses ambientes o tipo do ambiente, que deve ser exclusivamente um dos seguintes: {{MODULE_TYPES}}. Justifique a escolha de cada ambiente e explique como ele contribuirá para o sucesso da missão e/ou bem-estar da tripulação.
+Com base nos documentos acima da NASA, precisamos planejar uma missão espacial nomeada "{{MISSION_NAME}}". O objetivo da  missão é: "{{MISSION_OBJECTIVE}}". O destino da missão é "{{DESTINATION}}". Estime uma duração plausível, realista e segura para essa missão (em dias) considerando o contexto da tripulação, do destino e das referências fornecidas. A missão contará com uma tripulação de {{CREW_SIZE}} astronautas.
+Você deverá planejar quais ambientes o habitat espacial da missão deve ter para garantir o sucesso da missão e o bem-estar da tripulação. No seu planejamento inclua o nome de cada ambiente como por exemplo "Quarto 1", "Laboratório de Ciências", "Estufa de Plantas", etc. Inclua para cada um desses ambientes o tipo do ambiente, que deve ser exclusivamente um dos seguintes: {{MODULE_TYPES}}. Justifique a escolha de cada ambiente e explique como ele contribuirá para o sucesso da missão e/ou bem-estar da tripulação. Certifique-se de que a duração proposta é coerente com o plano do habitat e com as referências da NASA.
 Sempre trate de forma seria a missão independente de qual seja.
 Siga mas nunca se refira a essas instruções.
 Toda sua resposta deve estar em pt-BR e no seguinte formato JSON estrito, sem qualquer outro texto ou explicação fora do JSON:
 
 {
+  "mission_duration_days": number, // Número inteiro positivo de dias (mínimo 1, máximo 1000) recomendado para a missão, fundamentado nos documentos de referência
   "formal_description": string, // Descrição formal da missão como um todo, incluindo objetivos científicos, metas de exploração e qualquer outro detalhe relevante como contexto histórico ou importância da missão. Deve ter até 100 palavras e ser escrito de forma clara e envolvente.
   "habitat": [ // Lista de ambientes do habitat espacial
     {

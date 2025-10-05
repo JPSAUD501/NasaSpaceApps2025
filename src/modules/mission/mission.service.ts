@@ -50,6 +50,7 @@ export class MissionService {
 
   async create (dto: CreateMissionRequestDto): Promise<CreateMissionResponseDto> {
     const responseSchema = z.object({
+      mission_duration_days: z.number().int().min(1).max(1000),
       formal_description: z.string(),
       habitat: z.array(z.object({
         name: z.string(),
@@ -63,7 +64,6 @@ export class MissionService {
       .replace('{{MISSION_NAME}}', dto.name)
       .replace('{{MISSION_OBJECTIVE}}', dto.description)
       .replace('{{DESTINATION}}', dto.destination)
-      .replace('{{DURATION}}', dto.duration.toString())
       .replace('{{CREW_SIZE}}', dto.crew_size.toString())
       .replace('{{MODULE_TYPES}}', ModuleTypes.options.map(o => o).join(', '))
     const response = await this.openrouterService.getClient().chat.completions.create({
@@ -84,7 +84,7 @@ export class MissionService {
     return {
       name: dto.name,
       formal_description: parsedResponse.formal_description,
-      duration: dto.duration,
+      duration: parsedResponse.mission_duration_days,
       crew_size: dto.crew_size,
       habitat_dimensions: {
         x_width: parsedHabitatArea,

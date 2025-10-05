@@ -63,7 +63,6 @@ describe('MissionService', () => {
       architect_name: 'Anonimo',
       description: 'Explorar o planeta marte para encontrar sofas naturais e estudar sua viabilidade para o descanso da tripulação e exportação marciana.',
       crew_size: 5,
-      duration: 365,
       destination: 'mars'
     } satisfies z.input<typeof CreateMissionRequestSchema>
 
@@ -74,8 +73,10 @@ describe('MissionService', () => {
     console.debug(response)
 
     expect(response.name).toBe(request.name)
-    expect(response.duration).toBe(request.duration)
     expect(response.crew_size).toBe(request.crew_size)
+    expect(response.duration).toBeGreaterThanOrEqual(1)
+    expect(response.duration).toBeLessThanOrEqual(1000)
+    expect(Number.isInteger(response.duration)).toBe(true)
     expect(response.formal_description.length).toBeGreaterThan(0)
     expect(response.habitat_dimensions.x_width).toBeGreaterThan(0)
     expect(response.habitat_dimensions.y_width).toBeGreaterThan(0)
@@ -132,5 +133,5 @@ describe('MissionService', () => {
 
     expect(evaluation.pdf_base64).toBeDefined()
     expect((evaluation.pdf_base64 ?? '').length).toBeGreaterThan(0)
-  }, 40000)
+  }, 90000)
 })
