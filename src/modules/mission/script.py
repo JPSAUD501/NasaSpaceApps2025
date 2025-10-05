@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 # --- Markdown -> HTML ---
 try:
-    import markdown  # python-markdown
+    import markdown  # type: ignore # python-markdown
 except ImportError:
     print("Erro: biblioteca 'markdown' não encontrada. pip install markdown", file=sys.stderr)
     sys.exit(2)
